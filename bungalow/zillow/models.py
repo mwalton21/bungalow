@@ -29,18 +29,91 @@ class Listing(models.Model):
     property_type = models.CharField('type', max_length=100)
     # XXX should this be auto-generated?
     link = models.URLField()
+
+    # housing information which may be null (as land does not have a structure)
+    # did not put into a separate table as there is no need to have a 1-N
+    # relationship so it should be more efficient to just have a larger
+    # table set returned
+    bathrooms = models.PositiveIntegerField(null=True)
+    bedrooms = models.PositiveIntegerField(null=True)
+    size = models.PositiveIntegerField(null=True)
+    year_build = models.PositiveIntegerField(null=True)
+
+    def __str__(self):
+        return "{}/{}".format(self.bedrooms, self.bathrooms)
+
+    @property
+    def current_price(self):
+        return self.price_set.order_by('-date').first()
+
+    @property
+    def latest_tax(self):
+        return self.tax_set.order_by('-date').first()
+
+    @property
+    def current_rent(self):
+        return self.rent_set.order_by('-date').first()
+
+    @property
+    def current_rent_estimate(self):
+        return self.rent_estimate_set.order_by('-estimate_date').first()
+
+    @property
+    def last_sale(self):
+        return self.sale_set.order_by('-date').first()
+
+    @property
+    def zestimate(self):
+        return self.estimate_set.order_by('-estimate_date').first()
+
+    def __str__(self):
+        return "{}, {}, {}, {:05d} ({})".format(
+            self.address,
+            self.city,
+            self.state,
+            self.zipcode,
+            self.id,
+        )
+
+
+class Price(models.Model):
+    # allow prices for historical information in the future
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
-    property_size = models.PositiveIntegerField()
+    date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return "${:,.2f} ({})".format(self.price, self.date)
+
+
+class Tax(models.Model):
+    # allow for historical tax data in the future
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     tax_value = models.PositiveIntegerField()
     tax_year = models.PositiveIntegerField()
 
+    def __str__(self):
+        return "{} ({})".format(self.tax_value, self.tax_year)
+
 
 class Rent(models.Model):
-    # allow multiple estimates for a given property (we will only show last)
+    # allow historical actual rent information
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     price = models.PositiveIntegerField(null=True)
+    date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return "${:,.2f} ({})".format(self.price, self.date)
+
+
+class RentEstimate(models.Model):
+    # allow multiple estimates for a given property (we will only show last)
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     estimate_amount = models.PositiveIntegerField()
     estimate_date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return "${:,.2f} ({})".format(self.estimate_amount, self.estimate_date)
 
 
 class Sale(models.Model):
@@ -48,17 +121,14 @@ class Sale(models.Model):
     price = models.PositiveIntegerField('last sold price', null=True)
     date = models.DateField('last sold date', auto_now=True)
 
+    def __str__(self):
+        return "${:,.2f} ({})".format(self.price, self.date)
+
 
 class Estimate(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     estimate_amount = models.PositiveIntegerField()
     estimate_date = models.DateField(auto_now=True)
 
-
-class Building(models.Model):
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
-    area_unit = models.CharField(max_length=100)
-    bathrooms = models.PositiveIntegerField()
-    bedrooms = models.PositiveIntegerField()
-    size = models.PositiveIntegerField()
-    year_build = models.PositiveIntegerField()
+    def __str__(self):
+        return "${:,.2f} ({})".format(self.estimate_amount, self.estimate_date)
