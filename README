@@ -6,3 +6,10 @@ Assumptions:
 
 NOTES:
 * this is not a pretty website implementation! :)
+* It also appears that I missed the mark on the fact DRF was a physical standard library that could be used. So I feel that this implementation misses
+the mark of what was expected. It does, however, implement the injest of the data set as requested. 
+
+* I tried to think of where this data would be used and how this would be extended
+  * see the 1-N models to allow growth of data points
+* The implementation is not the most efficient and would ideally be parsed in chunks to avoid memory size issues
+
