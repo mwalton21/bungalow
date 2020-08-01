@@ -1,0 +1,8 @@
+Assumptions:
+* If the home_size doesn't make sense we trust the source as long as there is valid (non-negative integer in place); i.e. home_size of 2
+* sale price is in dollars if no unit is specified
+* import is not atomic; do our best to import as much as possible
+* import of the same data can be done multiple times; this will update accordingly and not create new listings 
+
+NOTES:
+* this is not a pretty website implementation! :)

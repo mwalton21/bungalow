@@ -18,6 +18,6 @@ from django.conf.urls import include
 from django.contrib import admin
 
 urlpatterns = [
-    url('zillow/', include('zillow.urls')),
+    url(r'^zillow/', include('zillow.urls')),
     url(r'^admin/', admin.site.urls),
 ]

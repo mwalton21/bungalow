@@ -1,0 +1,7 @@
+<a href="{% url 'zillow:listing' listing.id %}">Back to Listing</a>
+
+<ul>
+{% for sale in listing.sales %}
+   <li>{{ sale }}</li>
+{% endfor %}
+</ul>

@@ -1,0 +1,12 @@
+{% if listings %}
+    <ul>
+    {% for zlist in listings %}
+        <li><a href="/zillow/{{ zlist.id }}/">{{ zlist }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No listings are available.</p>
+{% endif %}
+
+<br/>
+<a href="{% url 'zillow:ingest' %}">Import Data</a>

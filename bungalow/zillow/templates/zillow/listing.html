@@ -1,0 +1,27 @@
+<h1>{{ listing.address }}, {{ listing.city }} {{ listing.state }} {{ listing.zipcode }}</h1>
+
+<p>Property Size: {{ listing.property_size }} {{ listing.area_unit }} </p>
+<p>Property Type: {{ listing.property_type }}</p>
+<p>Zillow Link: <a href="{{ listing.link }}">{{ listing }}</a>
+
+
+{# this is cheap as we assume vacant land doesn't have a structure #}
+{% if listing.property_type != 'VacantResidentalLand' %}
+    <p>Bedrooms: {{ listing.bedrooms }}</p>
+    <p>Bathrooms: {{ listing.bathrooms }} </p>
+    <p>Size: {{ listing.size }} </p>
+    <p>Year Built: {{ listing.year_build }} </p>
+{% endif %}
+
+{% if listing.current_price %} 
+    <p>Current Price: {{ listing.current_price.price }} (as of {{ listing.current_price.date }}</p>
+{% else %} 
+    <p>Current Price: no current price listed</p>
+{% endif %}
+
+{% if listing.last_sale %}
+    <p>Last Sale: {{ listing.last_sale.price }} on {{ listing.last_sale.date }}</p>
+    <a href="{% url 'zillow:sale_history' listing.id %}>Sale History</a>
+{% else %}
+    <p>Current Price: no current price listed</p>
+{% endif %}

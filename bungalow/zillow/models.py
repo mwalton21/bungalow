@@ -34,10 +34,12 @@ class Listing(models.Model):
     # did not put into a separate table as there is no need to have a 1-N
     # relationship so it should be more efficient to just have a larger
     # table set returned
-    bathrooms = models.PositiveIntegerField(null=True)
-    bedrooms = models.PositiveIntegerField(null=True)
+    bathrooms = models.FloatField(null=True)
+    bedrooms = models.FloatField(null=True)
     size = models.PositiveIntegerField(null=True)
     year_build = models.PositiveIntegerField(null=True)
+    # useful for ordering purposes
+    last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "{}/{}".format(self.bedrooms, self.bathrooms)
@@ -63,16 +65,19 @@ class Listing(models.Model):
         return self.sale_set.order_by('-date').first()
 
     @property
+    def sales(self):
+        return self.sale_set.order_by('-date')
+
+    @property
     def zestimate(self):
         return self.estimate_set.order_by('-estimate_date').first()
 
     def __str__(self):
-        return "{}, {}, {}, {:05d} ({})".format(
+        return "{}, {}, {}, {:05d}".format(
             self.address,
             self.city,
             self.state,
             self.zipcode,
-            self.id,
         )
 
 
@@ -89,7 +94,7 @@ class Price(models.Model):
 class Tax(models.Model):
     # allow for historical tax data in the future
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
-    tax_value = models.PositiveIntegerField()
+    tax_value = models.FloatField()
     tax_year = models.PositiveIntegerField()
 
     def __str__(self):
@@ -99,7 +104,7 @@ class Tax(models.Model):
 class Rent(models.Model):
     # allow historical actual rent information
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
-    price = models.PositiveIntegerField(null=True)
+    price = models.PositiveIntegerField()
     date = models.DateField(auto_now=True)
 
     def __str__(self):
